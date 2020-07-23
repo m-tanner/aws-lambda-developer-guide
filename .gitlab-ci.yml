@@ -1,0 +1,79 @@
+# Required to set in Gitlab CI/CD variables:
+#   AWS_ACCESS_KEY_ID
+#   AWS_SECRET_ACCESS_KEY
+#   TF_VAR_LAMBDA_USERNAME (defaults to hello_lambda_spring_boot)
+#   TF_VAR_LAMBDA_PASSWORD
+
+stages:
+  - init
+  - terraform:test
+  - terraform:deploy
+
+.maven_common:
+  image: maven:3-jdk-8
+  cache:
+    paths:
+      - .m2/repository
+
+.terraform_job:
+  image: hashicorp/terraform:0.12.28
+  cache:
+    policy: pull
+    paths:
+      - src/main/terraform/.terraform/plugins
+
+.terraform_env:
+  extends:
+    - .terraform_job
+  needs:
+    - job: terraform:init
+      artifacts: true
+  before_script:
+    - cd src/main/terraform
+
+maven:build:
+  extends:
+    - .maven_common
+  stage: init
+  script:
+    - mvn --batch-mode -pl . package generate-resources -P docker,default -DskipDocker -DskipTests
+  artifacts:
+    paths:
+      - target/*.jar
+    expire_in: 24 hrs
+
+terraform:init:
+  extends:
+    - .terraform_job
+  stage: init
+  cache:
+    policy: pull-push
+  artifacts:
+    expire_in: 24 hours
+    paths:
+      - src/main/terraform/.terraform/terraform.tfstate
+  script:
+    - cd src/main/terraform
+    - terraform init
+
+terraform:test:
+  extends:
+    - .terraform_env
+  stage: terraform:test
+  script:
+    - terraform validate
+    - terraform plan
+  needs:
+    - maven:build
+    - terraform:init
+
+terraform:deploy:
+  extends:
+    - .terraform_env
+  stage: terraform:deploy
+  when: manual
+  script:
+    - terraform apply -auto-approve -lock=true
+  needs:
+    - maven:build
+    - terraform:init

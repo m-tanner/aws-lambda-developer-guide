@@ -1,0 +1,87 @@
+.cache
+*.pyc
+.idea/
+*.egg
+*__pycache__*
+*.eggs
+*.egg-info
+*.swp
+*.out
+*.log
+venv/
+.DS_Store
+/tmp/
+.idea
+/*.iml
+**/.terraform
+/src/main/terraform/files/
+
+# IntelliJ project files
+*.iml
+out
+gen
+
+# Maven
+target
+application-default.properties
+test-default.properties
+.settings
+.factorypath
+.project
+.classpath
+
+### Emacs ###
+# -*- mode: gitignore; -*-
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Org-mode
+.org-id-locations
+*_archive
+
+# flymake-mode
+*_flymake.*
+
+# eshell files
+/eshell/history
+/eshell/lastdir
+
+# elpa packages
+/elpa/
+
+# reftex files
+*.rel
+
+# AUCTeX auto folder
+/auto/
+
+# cask packages
+.cask/
+dist/
+
+# Flycheck
+flycheck_*.el
+
+# server auth directory
+/server/
+
+# projectiles files
+.projectile
+
+# directory configuration
+.dir-locals.el
+
+# network security
+/network-security.data
+
+
+# End of https://www.gitignore.io/api/emacs
+swagger-generated
+
+.aws-sam/
